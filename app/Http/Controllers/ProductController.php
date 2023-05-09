@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\Product;
+use GrahamCampbell\ResultType\Success;
 
 class ProductController extends Controller
 {
@@ -16,7 +17,9 @@ class ProductController extends Controller
     public function index()
     {
         //
-        return view('products.index');
+
+        $product = Product::orderBy('created_at', 'DESC')->get();
+        return view('products.index', compact('product'));
     }
 
     /**
@@ -39,17 +42,21 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         //
+        Product::create($request->all());
+        return redirect()->route('products')->with('success', 'Produto adicionado com sucesso!');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  string  $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
         //
+        $product = Product::findOrFail($id);
+        return view('products.show', compact('product'));
     }
 
     /**
@@ -61,6 +68,8 @@ class ProductController extends Controller
     public function edit($id)
     {
         //
+        $product = Product::findOrFail($id);
+        return view('products.edit', compact('product'));
     }
 
     /**
@@ -73,6 +82,10 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $product = Product::findOrFail($id);
+        $product->update($request->all());
+
+        return redirect()->route('products')->with('success', 'Produto atualizado com sucesso!');
     }
 
     /**
@@ -84,5 +97,9 @@ class ProductController extends Controller
     public function destroy($id)
     {
         //
+        $product = Product::findOrFail($id);
+        $product->delete();
+        return redirect()->route('products')->with('success', 'Produto removido com sucesso!');
+
     }
 }
